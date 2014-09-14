@@ -9,7 +9,7 @@ channel = connection.channel()
 """ 2. Create a queue to receive messages at the sender side.
        queue name is 'hello'
 """
-channel.queue_declare(queue='hello')
+#channel.queue_declare(queue='hello')
 
 """ 3. Specify an  'exchange' and bind it with the queue.
        In RabbitMQ a message can never be sent directly to the queue, 

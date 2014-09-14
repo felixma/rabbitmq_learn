@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 import pika
 
+# Create a connection
 connection = pika.BlockingConnection(pika.ConnectionParameters(
         host='localhost'))
-
 channel = connection.channel()
 
+# Create a queue to receive request
 channel.queue_declare(queue='rpc_queue')
 
 def fib(n):
@@ -16,6 +17,8 @@ def fib(n):
     else:
         return fib(n-1) + fib(n-2)
 
+# 'on_request' is the callback function.
+# It will send a reply.
 def on_request(ch, method, props, body):
     n = int(body)
 
@@ -23,6 +26,7 @@ def on_request(ch, method, props, body):
     response = fib(n)
 
     ch.basic_publish(exchange='',
+                     # send reply to 'reply_to' queue, with correlation_id
                      routing_key=props.reply_to,
                      properties=pika.BasicProperties(correlation_id = \
                                                      props.correlation_id),

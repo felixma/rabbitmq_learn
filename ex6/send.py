@@ -15,6 +15,7 @@ class FibonacciRpcClient(object):
         self.callback_queue = result.method.queue
         self.channel.basic_consume(self.on_response, no_ack=True,
                                    queue=self.callback_queue)
+
     # The 'on_response' callback executed on every response.
     # For every response message it checks if the correlation_id is the one we're looking for. 
     # If so, it saves the response in self.response and breaks the consuming loop.
@@ -24,11 +25,12 @@ class FibonacciRpcClient(object):
 
     # call() do the RPC request
     # It generates an unique corr_id
+    # 'on_response' callback function will use this value to catch the appropriate response.
     def call(self, n):
         self.response = None
         self.corr_id = str(uuid.uuid4())
         self.channel.basic_publish(exchange='',
-                                   routing_key='rpc_queue',
+                                   routing_key='rpc_queue',   # Why 'rpc_queue' isn't declared in send.py
                                    properties=pika.BasicProperties(
                                          reply_to = self.callback_queue,
                                          correlation_id = self.corr_id,
